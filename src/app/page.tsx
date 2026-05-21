@@ -1,12 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import { MetricCardView, ChartView } from "@/components/dashboard-views";
+import {
+  MetricCardView,
+  ChartView,
+  DynamicFormView,
+} from "@/components/dashboard-views";
+
+// Definisi spesifik untuk masing-masing komponen
+type MetricCardProps = {
+  title: string;
+  value?: string;
+  description?: string;
+};
+
+type ChartProps = {
+  title: string;
+  data?: { name: string; value: number }[];
+};
+
+type DynamicFormProps = {
+  title: string;
+  fields?: {
+    name: string;
+    label: string;
+    type: string;
+    placeholder?: string;
+  }[];
+  submitLabel?: string;
+};
+
+// Gabungan struktur data yang dikirim oleh Gemini
+type GenerationData = {
+  uiComponent?:
+    | { name: "renderMetricCard"; props: MetricCardProps }
+    | { name: "renderChart"; props: ChartProps }
+    | { name: "renderDynamicForm"; props: DynamicFormProps };
+  explanation?: string;
+};
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [generation, setGeneration] = useState<any>(null);
+  const [generation, setGeneration] = useState<GenerationData | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +70,7 @@ export default function Home() {
 
         accumulatedText += decoder.decode(value);
 
-        // Perbaikan di bagian ini: Logika penanganan parsing JSON parsial
+        // Logika penanganan parsing JSON parsial
         try {
           const lastCurly = accumulatedText.lastIndexOf("}");
           if (lastCurly !== -1) {
@@ -72,7 +108,7 @@ export default function Home() {
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Contoh: 'Tampilkan tren omset toko dari Senin sampai Jumat'..."
+            placeholder="Contoh: 'Buatkan form untuk mencatat inventaris barang masuk'..."
             className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-900"
             disabled={loading}
           />
@@ -86,20 +122,41 @@ export default function Home() {
         </form>
 
         <div className="space-y-4 pt-4 border-t border-slate-200">
-          {uiComponent?.name === "renderMetricCard" && uiComponent.props && (
-            <MetricCardView {...uiComponent.props} />
+          {/* Render Metric Card secara eksplisit dengan default value */}
+          {uiComponent?.name === "renderMetricCard" && (
+            <MetricCardView
+              title={uiComponent.props.title}
+              value={uiComponent.props.value || "-"}
+              description={uiComponent.props.description || ""}
+            />
           )}
 
-          {uiComponent?.name === "renderChart" && uiComponent.props?.data && (
-            <ChartView {...uiComponent.props} />
+          {/* Render Chart secara eksplisit */}
+          {uiComponent?.name === "renderChart" && uiComponent.props.data && (
+            <ChartView
+              title={uiComponent.props.title}
+              data={uiComponent.props.data}
+            />
           )}
 
+          {/* Render Form secara eksplisit dengan default value untuk submitLabel */}
+          {uiComponent?.name === "renderDynamicForm" &&
+            uiComponent.props.fields && (
+              <DynamicFormView
+                title={uiComponent.props.title}
+                fields={uiComponent.props.fields}
+                submitLabel={uiComponent.props.submitLabel || "Simpan Data"}
+              />
+            )}
+
+          {/* Render Penjelasan */}
           {generation?.explanation && (
             <p className="text-sm text-slate-600 bg-white p-4 rounded-lg shadow-sm border border-slate-100 italic">
               {generation.explanation}
             </p>
           )}
 
+          {/* Render State Kosong */}
           {!generation && !loading && (
             <p className="text-center text-sm text-slate-400 py-12">
               Belum ada komponen yang dibuat. Ketik sesuatu di atas!

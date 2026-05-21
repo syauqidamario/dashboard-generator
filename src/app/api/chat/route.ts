@@ -15,45 +15,49 @@ export async function POST(req: Request) {
     Pilih nama 'renderMetricCard' jika mereka menanyakan angka tunggal, data ringkas, atau skor kritikal.
     Pilih nama 'renderChart' jika mereka meminta analisis tren, grafik harian, atau performa berkala beruntun.`,
     prompt: prompt,
+    // ... (kode atasnya tetap sama)
     schema: z.object({
       uiComponent: z.object({
-        name: z.enum(["renderMetricCard", "renderChart"]),
+        name: z.enum(["renderMetricCard", "renderChart", "renderDynamicForm"]), // <-- Tambah opsi baru
         props: z.object({
-          title: z.string().describe("Judul komponen atau grafik visual"),
-          value: z
-            .string()
-            .optional()
-            .describe(
-              "Nilai angka utama (khusus untuk renderMetricCard), contoh: Rp 5.000.000 atau 450 Orang",
-            ),
-          description: z
-            .string()
-            .optional()
-            .describe(
-              "Keterangan tambahan tren persentase atau konklusi singkat metrik",
-            ),
-          data: z
+          // ... (properti title, value, description, data biarkan sama seperti sebelumnya)
+          title: z.string().describe("Judul komponen, grafik, atau formulir"),
+          value: z.string().optional(),
+          description: z.string().optional(),
+          data: z.array(z.any()).optional(),
+
+          // ---> TAMBAHKAN BLOK INI UNTUK FORM <---
+          fields: z
             .array(
               z.object({
                 name: z
                   .string()
-                  .describe(
-                    "Label sumbu X waktu/hari, contoh: Sen, Sel, atau Jan, Feb",
-                  ),
-                value: z.number().describe("Nilai metrik angka grafik batang"),
+                  .describe("Nama variabel field (tanpa spasi, camelCase)"),
+                label: z
+                  .string()
+                  .describe("Label teks yang akan dibaca pengguna"),
+                type: z
+                  .enum(["text", "number", "email", "date"])
+                  .describe("Tipe input HTML standar"),
+                placeholder: z
+                  .string()
+                  .optional()
+                  .describe("Teks bantuan di dalam kolom input"),
               }),
             )
             .optional()
             .describe(
-              "Data array koordinat (khusus untuk komponen renderChart)",
+              "Array berisi daftar kolom input yang dibutuhkan (khusus untuk renderDynamicForm)",
             ),
+          submitLabel: z
+            .string()
+            .optional()
+            .describe("Teks pada tombol submit form (contoh: Simpan Data)"),
         }),
       }),
       explanation: z
         .string()
-        .describe(
-          "Penjelasan naratif singkat mengenai data analitik yang sedang ditampilkan di atas",
-        ),
+        .describe("Penjelasan naratif singkat mengenai komponen yang dibuat"),
     }),
   });
 
