@@ -53,6 +53,12 @@ export async function POST(req: Request) {
             .string()
             .optional()
             .describe("Teks pada tombol submit form (contoh: Simpan Data)"),
+          themeColor: z
+            .enum(["blue", "emerald", "rose", "amber", "violet"])
+            .optional()
+            .describe(
+              "Warna tema form. Sesuaikan dengan konteks (contoh: rose untuk medis/urgent, blue untuk formal/korporat, emerald untuk sukses/keuangan, amber untuk peringatan/logistik).",
+            ),
         }),
       }),
       explanation: z

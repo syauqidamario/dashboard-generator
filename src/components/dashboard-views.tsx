@@ -94,17 +94,53 @@ export function ChartView({
 }
 
 // Komponen 3: Dynamic Form View (Baru)
+// Komponen 3: Dynamic Form View (Dengan Tema Warna Dinamis)
 export function DynamicFormView({
   title,
   fields,
   submitLabel = "Submit",
+  themeColor = "emerald", // Warna default jika AI tidak memilih
 }: {
   title: string;
   fields: { name: string; label: string; type: string; placeholder?: string }[];
   submitLabel?: string;
+  themeColor?: "blue" | "emerald" | "rose" | "amber" | "violet";
 }) {
+  // Kamus warna Tailwind (Wajib ditulis utuh agar terbaca oleh compiler Tailwind)
+  const colorStyles = {
+    blue: {
+      border: "border-t-blue-500",
+      button: "bg-blue-600 hover:bg-blue-700",
+      ring: "focus:ring-blue-500",
+    },
+    emerald: {
+      border: "border-t-emerald-500",
+      button: "bg-emerald-600 hover:bg-emerald-700",
+      ring: "focus:ring-emerald-500",
+    },
+    rose: {
+      border: "border-t-rose-500",
+      button: "bg-rose-600 hover:bg-rose-700",
+      ring: "focus:ring-rose-500",
+    },
+    amber: {
+      border: "border-t-amber-500",
+      button: "bg-amber-600 hover:bg-amber-700",
+      ring: "focus:ring-amber-500",
+    },
+    violet: {
+      border: "border-t-violet-500",
+      button: "bg-violet-600 hover:bg-violet-700",
+      ring: "focus:ring-violet-500",
+    },
+  };
+
+  const theme = colorStyles[themeColor] || colorStyles.emerald;
+
   return (
-    <Card className="w-full max-w-lg shadow-md bg-white border-t-4 border-t-emerald-500">
+    <Card
+      className={`w-full max-w-lg shadow-md bg-white border-t-4 ${theme.border}`}
+    >
       <CardHeader>
         <CardTitle className="text-xl font-bold text-slate-900">
           {title}
@@ -134,13 +170,13 @@ export function DynamicFormView({
                 type={field.type}
                 name={field.name}
                 placeholder={field.placeholder}
-                className="px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                className={`px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 text-sm ${theme.ring}`}
               />
             </div>
           ))}
           <button
             type="submit"
-            className="w-full mt-4 px-4 py-2 bg-emerald-600 text-white font-medium rounded-md shadow hover:bg-emerald-700 transition-colors"
+            className={`w-full mt-4 px-4 py-2 text-white font-medium rounded-md shadow transition-colors ${theme.button}`}
           >
             {submitLabel}
           </button>

@@ -28,6 +28,7 @@ type DynamicFormProps = {
     placeholder?: string;
   }[];
   submitLabel?: string;
+  themeColor?: "blue" | "emerald" | "rose" | "amber" | "violet";
 };
 
 // Gabungan struktur data yang dikirim oleh Gemini
@@ -146,6 +147,7 @@ export default function Home() {
                 title={uiComponent.props.title}
                 fields={uiComponent.props.fields}
                 submitLabel={uiComponent.props.submitLabel || "Simpan Data"}
+                themeColor={uiComponent.props.themeColor}
               />
             )}
 
