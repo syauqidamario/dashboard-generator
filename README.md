@@ -58,4 +58,3 @@ git clone [https://github.com/syauqidamario/dashboard-generator.git](https://git
 cd dashboard-generator
 npm install
 ```
-
